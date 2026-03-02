@@ -1,5 +1,21 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator
 from django.urls import reverse
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+    name = models.CharField(max_length=50)
+    short_bio = models.TextField(
+        validators=[MinLengthValidator(255)])
+
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(models.Model):
@@ -12,11 +28,20 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     name = models.CharField(max_length=255)
 
+    author = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name="recipes",
+    )
+
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("recipe_detail", args=[self.id])
+        return reverse("recipe_detail", kwargs={"pk": self.pk})
 
 
 class RecipeIngredient(models.Model):

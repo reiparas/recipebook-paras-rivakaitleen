@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>Recipe Book</title>
+</head>
+
+<header>
+    <h1>Welcome to Rei's Recipe Book</h1>
+</header>
+
+{% block content %}
+<h2>Login</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+</form>
+
+<a href="{% url 'password_reset' %}">Forgot password?</a>
+{% endblock %}
