@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
-from django.urls import reverse
+from django.urls import reverse_lazy, reverse
+from django.views.generic import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class Profile(models.Model):
@@ -62,11 +64,12 @@ class RecipeIngredient(models.Model):
     def __str__(self):
         return f"{self.quantity} of {self.ingredient.name}"
 
+
 class RecipeImage(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name="images"
+        related_name="recipe_images"  # match your template
     )
 
     image = models.ImageField(upload_to="recipe_images/")
@@ -75,3 +78,16 @@ class RecipeImage(models.Model):
     def __str__(self):
         return f"Image for {self.recipe.name}"
 
+
+class RecipeImageCreateView(LoginRequiredMixin, CreateView):
+    model = RecipeImage
+    fields = ['image', 'description']  
+    template_name = 'ledger/recipe_add_image.html'
+
+    def form_valid(self, form):
+        # Link image to correct recipe
+        form.instance.recipe_id = self.kwargs['pk']
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('recipe_detail', kwargs={'pk': self.kwargs['pk']})
