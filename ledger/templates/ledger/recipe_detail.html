@@ -1,15 +1,22 @@
 {% extends "ledger/base.html" %}
 
-{% block page_title %}
-Recipe Detail
-{% endblock %}
-
 {% block content %}
-<h2>{{ recipe.name }} Ingredients</h2>
+
+<h2>{{ recipe.name }} Details </h2>
 
 <p>Author: {{ recipe.author.name }}</p>
 <p>Created: {{ recipe.created_on }}</p>
 <p>Updated: {{ recipe.updated_on }}</p>
+
+{% if recipe.pk %}
+    <a href="{% url 'recipe_add_image' recipe.pk %}">Add Image</a>
+{% endif %}
+
+<h3>Images & Ingredients</h3>
+
+{% for img in recipe.images.all %}
+    <img src="{{ img.image.url }}" alt="{{ img.description }}">
+{% endfor %}
 
 <ul>
     {% for ingredient in recipe.ingredients.all %}
